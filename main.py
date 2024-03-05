@@ -22,7 +22,7 @@ def main():
     Main function, currently serving as test
     '''
     cfg = get_cfg_defaults()
-    device = torch.device('mps')
+    device = torch.device('cuda')
     
     random.seed(cfg.SEED)
     np.random.seed(cfg.SEED)
@@ -59,13 +59,13 @@ def main():
     stripped_model = torch.nn.Sequential(*(list(no_classifier_model[0].children())[:-1]))
 
     model = MobileNetV2withDecoder(stripped_model, classes=1)
+    
     if cfg.RESUME_TRAINING:
         model.load_state_dict(torch.load(cfg.MODELS_PATH + 'model_300.pt'))
 
     # Loss and optimizer
     criterion = nn.BCELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=cfg.LR)
-    device = torch.device('mps')
 
     #Evaluation Metrics
     dice_metric = Dice(threshold=0.5)
