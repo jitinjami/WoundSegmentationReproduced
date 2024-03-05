@@ -9,6 +9,7 @@ _C.SEED = 42
 _C.DATA_PATH = "./data/"
 _C.MODELS_PATH = "./models/"
 _C.VIZ_PATH = "./reports/"
+_C.RESUME_TRAINING = True
 _C.MAKE_DATA = False
 _C.CLEAR_DATA = False
 _C.NUM_CLASSES = 1

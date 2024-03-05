@@ -59,6 +59,8 @@ def main():
     stripped_model = torch.nn.Sequential(*(list(no_classifier_model[0].children())[:-1]))
 
     model = MobileNetV2withDecoder(stripped_model, classes=1)
+    if cfg.RESUME_TRAINING:
+        model.load_state_dict(torch.load(cfg.MODELS_PATH + 'model_300.pt'))
 
     # Loss and optimizer
     criterion = nn.BCELoss()
