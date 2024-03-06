@@ -87,10 +87,5 @@ def main():
     #Test model
     test_results = test(trained_model, dataloaders, device, criterion, metrics)
 
-    #Save metric dataframes
-    train_results.to_csv('./train_results.csv')
-    val_results.to_csv('./val_results.csv')
-    test_results.to_csv('./test_results.csv')
-    
 if __name__ == '__main__':
     main()

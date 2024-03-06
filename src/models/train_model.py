@@ -92,6 +92,8 @@ def train(model, dataloaders, device, criterion, optimizer, num_epochs, metrics,
                 "Recall": train_metrics['recall'].compute().item(),
                 }
         
+        print(f"Epoch: {epoch}/{num_epochs}")
+        
         #Saving metrics every epoch
         train_df.to_csv(metric_save_path + 'train_results.csv')
         val_df.to_csv(metric_save_path + 'val_results.csv')
