@@ -54,7 +54,6 @@ def train(model, dataloaders, device, criterion, optimizer, num_epochs, metrics,
             train_metrics['dice'].update(outputs, masks.int())
             train_metrics['precision'].update(outputs, masks)
             train_metrics['recall'].update(outputs, masks)
-            break
 
         # Append training epoch results
         train_df.loc[len(train_df)] = {
@@ -80,7 +79,6 @@ def train(model, dataloaders, device, criterion, optimizer, num_epochs, metrics,
                 val_metrics['dice'].update(outputs, masks.int())
                 val_metrics['precision'].update(outputs, masks)
                 val_metrics['recall'].update(outputs, masks)
-                break
 
             # Append val epoch results
             # Append training epoch results
