@@ -102,7 +102,7 @@ def train(model, dataloaders, device, criterion, optimizer, num_epochs, metrics,
 
         # Early Stopping
         if val_df["Dice"].iloc[-1] - best_val_dice_coeff > tol:
-            best_val_dice_coeff = val_df["Dice"][-1]
+            best_val_dice_coeff = val_df["Dice"].iloc[-1]
             best_model = model.state_dict()  # Save the best model weights
             wait_count = 0
             print('Dice increased')
