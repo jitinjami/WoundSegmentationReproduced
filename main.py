@@ -50,6 +50,8 @@ def main():
 
     dataloaders = {x: DataLoader(dataset=datasets[x], batch_size=cfg.BATCH_SIZE, shuffle=True,
                                  num_workers=cfg.NUM_WORKERS, drop_last=True) for x in ['train','val', 'test']}
+    
+    print("Created Dataloaders")
 
     # Instantiate the model
     base_model = models.mobilenet_v2(weights='MobileNet_V2_Weights.IMAGENET1K_V1')
@@ -60,8 +62,11 @@ def main():
 
     model = MobileNetV2withDecoder(stripped_model, classes=1)
     
+    print("Instantiated Model")
+    
     if cfg.RESUME_TRAINING:
         model.load_state_dict(torch.load(cfg.MODELS_PATH + 'model_300.pt'))
+        print("Imported weights")
 
     # Loss and optimizer
     criterion = nn.BCELoss()
