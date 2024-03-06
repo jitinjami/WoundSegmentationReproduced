@@ -98,7 +98,7 @@ def train(model, dataloaders, device, criterion, optimizer, num_epochs, metrics,
 
         # Save model
         if epoch % 100 == 0:
-            torch.save(model.state_dict(), model_save_path + f'model_{epoch}.pt')
+            torch.save(model.state_dict(), model_save_path + f'model_{epoch+300}.pt')
 
         # Early Stopping
         if val_df["Dice"].iloc[-1] - best_val_dice_coeff > tol:
@@ -112,7 +112,7 @@ def train(model, dataloaders, device, criterion, optimizer, num_epochs, metrics,
 
         if epoch >= 100 and wait_count >= patience:
             print(f"Early stopping triggered after {wait_count} epochs!")
-            torch.save(model.state_dict(), model_save_path + f'best_model_{epoch}.pt')
+            torch.save(model.state_dict(), model_save_path + f'best_model_{epoch+300}.pt')
             return model, train_df, val_df
 
     return model, train_df, val_df
