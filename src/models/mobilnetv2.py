@@ -25,7 +25,7 @@ class MobileNetV2Decoder(nn.Module):
         self.relu = nn.ReLU()
 
         #BiLinear Upsampling
-        self.biup1 = torchvision.transforms.Resize(tuple(input_shape))
+        self.biup1 = torchvision.transforms.Resize(tuple(input_shape), antialias=True)
 
         self.seq1 = nn.Sequential(self.pool2d, self.conv2d1, self.bn, self.relu, self.biup1)
 
