@@ -5,7 +5,7 @@ Module defines the MobileNetV2 Encoder-Decoder architecture
 import torch
 from torch import nn
 import torchvision
-import numpy as np
+from torchvision import models
 
 class MobileNetV2Decoder(nn.Module):
     """
@@ -66,9 +66,11 @@ class MobileNetV2withDecoder(nn.Module):
         stripped_model = MobileNetV2 without the classification layer and the final layer 
                             to fit the paper discription
     """
-    def __init__(self, stripped_model: nn.Sequential, classes):
+    def __init__(self, classes):
         super(MobileNetV2withDecoder, self).__init__()
-
+        base_model = models.mobilenet_v2(weights='MobileNet_V2_Weights.IMAGENET1K_V1')
+        no_classifier_model = torch.nn.Sequential(*(list(base_model.children())[:-1]))
+        stripped_model = torch.nn.Sequential(*(list(no_classifier_model[0].children())[:-1]))
         self.encoder = stripped_model
 
         self.decoder = MobileNetV2Decoder(input_shape=(7,7), classes=classes)

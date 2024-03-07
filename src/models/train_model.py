@@ -6,7 +6,8 @@ from tqdm import tqdm
 import torch
 
 
-def train(model, dataloaders, device, criterion, optimizer, num_epochs, metrics, model_save_path, metric_save_path):
+def train(model, dataloaders, device, criterion, optimizer, num_epochs, 
+          metrics, model_save_path, model_name, metric_save_path):
     '''
     Train the model
     Args:
@@ -18,19 +19,21 @@ def train(model, dataloaders, device, criterion, optimizer, num_epochs, metrics,
         num_epochs: number of epochs
         metrics: List of metrics
     '''
-    train_metrics = {'dice': metrics[0].to(device), 'precision': metrics[1].to(device), 'recall':metrics[2].to(device)}
-    val_metrics = {'dice': metrics[0].to(device), 'precision': metrics[1].to(device), 'recall':metrics[2].to(device)}
+    train_metrics = {'dice': metrics[0].to(device), 'precision': metrics[1].to(device), 
+                     'recall':metrics[2].to(device), 'iou':metrics[3].to(device)}
+    val_metrics = {'dice': metrics[0].to(device), 'precision': metrics[1].to(device), 
+                   'recall':metrics[2].to(device), 'iou':metrics[3].to(device)}
     
     #Pandas dataframes for evaluation metrics
-    train_df = pd.DataFrame(columns=["Epoch", "BCELoss", "Dice", "Precision", "Recall"])
-    val_df = pd.DataFrame(columns=["Epoch", "BCELoss", "Dice", "Precision", "Recall"])
+    train_df = pd.DataFrame(columns=["Epoch", "Loss", "Dice", "Precision", "Recall", "IoU"])
+    val_df = pd.DataFrame(columns=["Epoch", "Loss", "Dice", "Precision", "Recall", "IoU"])
 
     # Training the model
     model = model.to(device)
 
     #Early stopping parameters
     wait_count = 0
-    tol = 1e-3
+    tol = 1e-4
     best_val_dice_coeff = -tol
     patience = 200
 
@@ -54,14 +57,16 @@ def train(model, dataloaders, device, criterion, optimizer, num_epochs, metrics,
             train_metrics['dice'].update(outputs, masks.int())
             train_metrics['precision'].update(outputs, masks)
             train_metrics['recall'].update(outputs, masks)
+            train_metrics['iou'].update(outputs, masks)
 
         # Append training epoch results
         train_df.loc[len(train_df)] = {
             "Epoch": epoch,
-            "BCELoss": loss.item(),
+            "Loss": loss.item(),
             "Dice": train_metrics['dice'].compute().item(),
             "Precision": train_metrics['precision'].compute().item(),
             "Recall": train_metrics['recall'].compute().item(),
+            "IoU": train_metrics['iou'].compute().item()
             }
             
         # Validate Model
@@ -79,15 +84,17 @@ def train(model, dataloaders, device, criterion, optimizer, num_epochs, metrics,
                 val_metrics['dice'].update(outputs, masks.int())
                 val_metrics['precision'].update(outputs, masks)
                 val_metrics['recall'].update(outputs, masks)
+                train_metrics['iou'].update(outputs, masks)
 
             # Append val epoch results
             # Append training epoch results
             val_df.loc[len(val_df)] = {
                 "Epoch": epoch,
-                "BCELoss": loss.item(),
+                "Loss": loss.item(),
                 "Dice": train_metrics['dice'].compute().item(),
                 "Precision": train_metrics['precision'].compute().item(),
                 "Recall": train_metrics['recall'].compute().item(),
+                "IoU": train_metrics['iou'].compute().item(),
                 }
         
         print(f"Epoch: {epoch}/{num_epochs}")
@@ -98,11 +105,12 @@ def train(model, dataloaders, device, criterion, optimizer, num_epochs, metrics,
 
         # Save model
         if epoch % 100 == 0:
-            torch.save(model.state_dict(), model_save_path + f'model_{epoch+300}.pt')
+            torch.save(model.state_dict(), model_save_path + f'{model_name}_model_{epoch}.pt')
 
         # Early Stopping
         if val_df["Dice"].iloc[-1] - best_val_dice_coeff > tol:
             best_val_dice_coeff = val_df["Dice"].iloc[-1]
+            best_epoch = epoch
             best_model = model.state_dict()  # Save the best model weights
             wait_count = 0
             print('Dice increased')
@@ -112,16 +120,18 @@ def train(model, dataloaders, device, criterion, optimizer, num_epochs, metrics,
 
         if epoch >= 100 and wait_count >= patience:
             print(f"Early stopping triggered after {wait_count} epochs!")
-            torch.save(model.state_dict(), model_save_path + f'best_model_{epoch+300}.pt')
+            torch.save(best_model.state_dict(), 
+                       model_save_path + f'{model_name}_best_model_{best_epoch}.pt')
             return model, train_df, val_df
 
     return model, train_df, val_df
 
-def test(model, dataloaders, device, criterion, metrics):
+def test(model, dataloaders, device, criterion, metrics, metric_save_path):
     
-    test_metrics = {'dice': metrics[0], 'precision': metrics[1], 'recall':metrics[2]}
+    test_metrics = {'dice': metrics[0], 'precision': metrics[1], 'recall':metrics[2], 
+                    'iou':metrics[3].to(device)}
 
-    test_df = pd.DataFrame(columns=["BCELoss", "Dice", "Precision", "Recall"])
+    test_df = pd.DataFrame(columns=["Loss", "Dice", "Precision", "Recall", "IoU"])
     
     # Test Model
     model.eval()
@@ -141,10 +151,12 @@ def test(model, dataloaders, device, criterion, metrics):
 
         # Append val epoch results
         test_df.loc[len(test_df)] = {
-            "BCELoss": loss.item(),
+            "Loss": loss.item(),
             "Dice": test_metrics['dice'].compute().item(),
             "Precision": test_metrics['precision'].compute().item(),
             "Recall": test_metrics['recall'].compute().item(),
         }
+        #Saving metrics every epoch
+        test_df.to_csv(metric_save_path + 'test_results.csv')
 
     return test_df
