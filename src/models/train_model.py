@@ -25,7 +25,6 @@ def train_epoch(model, dataloaders, device, criterion, optimizer, train_metrics,
         train_metrics['precision'].update(outputs, masks)
         train_metrics['recall'].update(outputs, masks)
         train_metrics['iou'].update(outputs, masks)
-        break
 
     # Append training epoch results
     train_df.loc[len(train_df)] = {
@@ -54,7 +53,6 @@ def val_epoch(model, dataloaders, device, criterion, val_metrics, val_df, epoch)
             val_metrics['precision'].update(outputs, masks)
             val_metrics['recall'].update(outputs, masks)
             val_metrics['iou'].update(outputs, masks)
-            break
 
         # Append val epoch results
         val_df.loc[len(val_df)] = {
@@ -125,7 +123,7 @@ def train(model, dataloaders, device, criterion, optimizer, num_epochs,
                 torch.save(model.state_dict(), model_save_path + f'{model_name}_model_{epoch}.pt')
 
         if model_name == 'WSNet':
-            if epoch % 1 == 0:
+            if epoch % 10 == 0:
                 model, val_metrics, val_df = val_epoch(model, dataloaders, device, 
                                                criterion, val_metrics, 
                                                val_df, epoch)

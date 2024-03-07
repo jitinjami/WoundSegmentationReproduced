@@ -124,7 +124,7 @@ def main():
         # Loss function
         criterion = DiceLoss()
 
-        cfg.TRAIN.NUM_EPOCHS = 1
+        cfg.TRAIN.NUM_EPOCHS = 100
         cfg.TRAIN.LR = 0.001
 
 
