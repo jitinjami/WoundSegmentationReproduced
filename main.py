@@ -18,6 +18,8 @@ from src.models.mobilnetv2 import MobileNetV2withDecoder
 from src.models.train_model import train, test
 from src.models.utils import DiceLoss
 from config.defaults import get_cfg_defaults
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
 
 def main():
     '''
