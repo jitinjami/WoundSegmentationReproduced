@@ -27,12 +27,21 @@ def main():
     '''
 
     #Argument parser
-    #parser = argparse.ArgumentParser(description='WoundSegmentation with MobileNetV2 and LinkNet')
-    #parser.add_argument('--data_only', type=bool, default=False)
+    parser = argparse.ArgumentParser(description='WoundSegmentation with MobileNetV2 and LinkNet')
+    parser.add_argument('--mnv2', action='store_true')
+    parser.add_argument('--no-mnv2', dest='mnv2', action='store_false')
+    parser.set_defaults(feature=True)
 
-    #args = parser.parse_args()
+
+    args = parser.parse_args()
     cfg = get_cfg_defaults()
-    #cfg.merge_from_lists(args)
+
+    if args.mnv2:
+        cfg.MNV2 = True
+    
+    if not args.mnv2:
+        cfg.MNV2 = False
+    
     device = None
 
     if torch.cuda.is_available():
@@ -65,7 +74,7 @@ def main():
         cfg.DATA.WS_AUG = True
         cfg.NAME = 'WSNet'
         cfg.TRAIN.BATCH_SIZE = 16
-    
+
     #Empty the data directories except 'external' if indicated
     if cfg.DATA.CLEAR:
         print("Emptying data directory except 'external'.")
@@ -115,7 +124,7 @@ def main():
         # Loss function
         criterion = DiceLoss()
 
-        cfg.TRAIN.NUM_EPOCHS = 100
+        cfg.TRAIN.NUM_EPOCHS = 1
         cfg.TRAIN.LR = 0.001
 
 
