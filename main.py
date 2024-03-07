@@ -109,7 +109,7 @@ def main():
         criterion = DiceLoss()
 
     # Optimizer
-    optimizer = torch.optim.Adam(model.parameters(), lr=cfg.LR)
+    optimizer = torch.optim.Adam(model.parameters(), lr=cfg.TRAIN.LR)
 
     #Evaluation Metrics
     dice_metric = Dice(threshold=0.5)
