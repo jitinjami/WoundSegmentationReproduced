@@ -20,7 +20,7 @@ _C.DATA.MAKE = False
 
 _C.MODEL = CN()
 _C.MODEL.MODELS_PATH = "./models/"
-_C.MODEL.RESUME_TRAINING = False
+_C.MODEL.RESUME_TRAIN = True
 
 _C.TRAIN = CN()
 _C.TRAIN.VIZ_PATH = "./reports/"
