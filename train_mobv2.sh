@@ -8,5 +8,5 @@
 module load cuda/11.8.0
 module load python/3.8-anaconda
 conda activate seg
-cd /home/hpc/iwso/iwso114h/~/WoundSegmentationReproduced/
-python3 main.py --mnv2
+cd /home/hpc/iwso/iwso114h/WoundSegmentationReproduced/
+python3 main.py --mnv2 --train --test
