@@ -156,7 +156,7 @@ def main():
                 test_results = test(trained_model, dataloaders, device, criterion, 
                                     metrics, model_name = cfg.NAME, metric_save_path=cfg.TRAIN.VIZ_PATH)
         elif not args.train:
-            model.load_state_dict(cfg.MODEL.MODELS_PATH + f'{cfg.NAME}_model_last.pt') 
+            model.load_state_dict(torch.load(cfg.MODEL.MODELS_PATH + f'{cfg.NAME}_model_last.pt'))
             #Test model
             test_results = test(model, dataloaders, device, criterion, metrics, 
                             model_name = cfg.NAME, metric_save_path=cfg.TRAIN.VIZ_PATH)
