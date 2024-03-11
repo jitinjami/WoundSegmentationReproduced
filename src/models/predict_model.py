@@ -12,7 +12,7 @@ def test(model, dataloaders, device, criterion, metrics, model_name, metric_save
     # Test Model
     model.eval()
     with torch.no_grad():
-        for images, masks in tqdm(dataloaders['test']):
+        for images, masks in dataloaders['test']:
             images = images.to(device)
             masks = masks.to(device)
             
