@@ -143,6 +143,10 @@ def main():
     metrics = [dice_metric, precision_metric, recall_metric, iou_metric]
 
     if args.train:
+        if cfg.MODEL.RESUME_TRAIN:
+            # Load Model
+            model.load_state_dict(torch.load(cfg.MODEL.MODELS_PATH + f'{cfg.NAME}_model_last.pt'
+                                             , map_location=device))
         #Train model
         trained_model, train_results, val_results = train(model, dataloaders, device, 
                                                       criterion, optimizer, cfg.TRAIN.NUM_EPOCHS, metrics,
@@ -156,6 +160,7 @@ def main():
                 test_results = test(trained_model, dataloaders, device, criterion, 
                                     metrics, model_name = cfg.NAME, metric_save_path=cfg.TRAIN.VIZ_PATH)
         elif not args.train:
+            # Load Model
             model.load_state_dict(torch.load(cfg.MODEL.MODELS_PATH + f'{cfg.NAME}_model_last.pt'
                                              , map_location=device))
             #Test model
