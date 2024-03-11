@@ -110,8 +110,8 @@ def train(model, dataloaders, device, criterion, optimizer, num_epochs,
         
         
         #Saving train metrics every epoch
-        train_df.to_csv(metric_save_path + 'train_results.csv')
-        val_df.to_csv(metric_save_path + 'val_results.csv')
+        train_df.to_csv(metric_save_path + f'{model_name}_train_results.csv')
+        val_df.to_csv(metric_save_path + f'{model_name}_val_results.csv')
 
         # Validate and Save model
         if model_name == 'MobileNetv2':
@@ -121,6 +121,7 @@ def train(model, dataloaders, device, criterion, optimizer, num_epochs,
                                                criterion, val_metrics, 
                                                val_df, epoch)
                 torch.save(model.state_dict(), model_save_path + f'{model_name}_model_{epoch}.pt')
+                torch.save(model.state_dict(), model_save_path + f'{model_name}_model_last.pt')
 
         if model_name == 'WSNet':
             if epoch % 10 == 0:
@@ -128,6 +129,7 @@ def train(model, dataloaders, device, criterion, optimizer, num_epochs,
                                                criterion, val_metrics, 
                                                val_df, epoch)
                 torch.save(model.state_dict(), model_save_path + f'{model_name}_model_{epoch}.pt')
+                torch.save(model.state_dict(), model_save_path + f'{model_name}_model_last.pt')
 
         # Early Stopping
         if val_df["Dice"].iloc[-1] - best_val_dice_coeff > tol:
@@ -147,38 +149,3 @@ def train(model, dataloaders, device, criterion, optimizer, num_epochs,
             return model, train_df, val_df
 
     return model, train_df, val_df
-
-def test(model, dataloaders, device, criterion, metrics, metric_save_path):
-    
-    test_metrics = {'dice': metrics[0], 'precision': metrics[1], 'recall':metrics[2], 
-                    'iou':metrics[3].to(device)}
-
-    test_df = pd.DataFrame(columns=["Loss", "Dice", "Precision", "Recall", "IoU"])
-    
-    # Test Model
-    model.eval()
-    with torch.no_grad():
-        for images, masks in tqdm(dataloaders['val']):
-            images = images.to(device)
-            masks = masks.to(device)
-            
-            # Forward pass
-            outputs = model(images)
-            loss = criterion(outputs, masks)
-
-            #Update metrics
-            test_metrics['dice'].update(outputs, masks.int())
-            test_metrics['precision'].update(outputs, masks)
-            test_metrics['recall'].update(outputs, masks)
-
-        # Append val epoch results
-        test_df.loc[len(test_df)] = {
-            "Loss": loss.item(),
-            "Dice": test_metrics['dice'].compute().item(),
-            "Precision": test_metrics['precision'].compute().item(),
-            "Recall": test_metrics['recall'].compute().item(),
-        }
-        #Saving metrics every epoch
-        test_df.to_csv(metric_save_path + 'test_results.csv')
-
-    return test_df

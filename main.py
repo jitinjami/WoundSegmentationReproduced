@@ -15,7 +15,8 @@ from src.data.dataset import ProcessedWoundDataset
 from src.data.make_dataset import make_dataset1, make_dataset2
 from src.utils import empty_directory
 from src.models.mobilnetv2 import MobileNetV2withDecoder
-from src.models.train_model import train, test
+from src.models.train_model import train
+from src.models.predict_model import test
 from src.models.utils import DiceLoss
 from config.defaults import get_cfg_defaults
 import ssl
@@ -30,6 +31,8 @@ def main():
     parser = argparse.ArgumentParser(description='WoundSegmentation with MobileNetV2 and LinkNet')
     parser.add_argument('--mnv2', action='store_true')
     parser.add_argument('--no-mnv2', dest='mnv2', action='store_false')
+    parser.add_argument("--train", action="store_true", default=False, help="Run the training module")
+    parser.add_argument("--test", action="store_true", default=False, help="Run the testing module")
     parser.set_defaults(feature=True)
 
 
@@ -139,15 +142,29 @@ def main():
 
     metrics = [dice_metric, precision_metric, recall_metric, iou_metric]
 
-    #Train model
-    trained_model, train_results, val_results = train(model, dataloaders, device, 
+    if args.train:
+        #Train model
+        trained_model, train_results, val_results = train(model, dataloaders, device, 
                                                       criterion, optimizer, cfg.TRAIN.NUM_EPOCHS, metrics,
                                                       model_save_path=cfg.MODEL.MODELS_PATH, 
                                                       model_name = cfg.NAME,
                                                       metric_save_path=cfg.TRAIN.VIZ_PATH)
+
+    if args.test:
+        if args.train:
+                #Test model
+                test_results = test(trained_model, dataloaders, device, criterion, 
+                                    metrics, model_name = cfg.NAME, metric_save_path=cfg.TRAIN.VIZ_PATH)
+        elif not args.train:
+            model.load_state_dict(cfg.MODEL.MODELS_PATH + f'{cfg.NAME}_model_last.pt') 
+            #Test model
+            test_results = test(model, dataloaders, device, criterion, metrics, 
+                            model_name = cfg.NAME, metric_save_path=cfg.TRAIN.VIZ_PATH)
+
+
+
     
-    #Test model
-    test_results = test(trained_model, dataloaders, device, criterion, metrics, metric_save_path=cfg.TRAIN.VIZ_PATH)
+    
 
 if __name__ == '__main__':
 
