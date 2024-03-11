@@ -70,6 +70,7 @@ def main():
         cfg.DATA.WS_AUG = False
         cfg.NAME = 'MobileNetv2'
         cfg.TRAIN.BATCH_SIZE = 2
+        cfg.TRAIN.LR = 0.0001
     
     if not cfg.MNV2:
         print("WSeg (LinkNet)")
@@ -77,6 +78,7 @@ def main():
         cfg.DATA.WS_AUG = True
         cfg.NAME = 'WSNet'
         cfg.TRAIN.BATCH_SIZE = 16
+        cfg.TRAIN.LR = 0.001
 
     #Empty the data directories except 'external' if indicated
     if cfg.DATA.CLEAR:
@@ -116,20 +118,12 @@ def main():
         
         # Loss function
         criterion = nn.BCELoss()
-        
-        cfg.TRAIN.BATCH_SIZE = 2
-        cfg.TRAIN.NUM_EPOCHS = 2000
-        cfg.TRAIN.LR = 0.0001
-
     
     if not cfg.MNV2:
         model = smp.Linknet(encoder_name="densenet169", encoder_weights="imagenet", in_channels=3, classes=1)
 
         # Loss function
         criterion = DiceLoss()
-
-        cfg.TRAIN.NUM_EPOCHS = 100
-        cfg.TRAIN.LR = 0.001
 
     # Optimizer
     optimizer = torch.optim.Adam(model.parameters(), lr=cfg.TRAIN.LR)
@@ -166,11 +160,6 @@ def main():
             #Test model
             test_results = test(model, dataloaders, device, criterion, metrics, 
                             model_name = cfg.NAME, metric_save_path=cfg.TRAIN.VIZ_PATH)
-
-
-
-    
-    
 
 if __name__ == '__main__':
 
