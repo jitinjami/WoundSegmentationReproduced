@@ -4,8 +4,8 @@ import tqdm
 
 def test(model, dataloaders, device, criterion, metrics, model_name, metric_save_path):
     
-    test_metrics = {'dice': metrics[0], 'precision': metrics[1], 'recall':metrics[2], 
-                    'iou':metrics[3]}
+    test_metrics = {'dice': metrics[0].to(device), 'precision': metrics[1].to(device), 
+                     'recall':metrics[2].to(device), 'iou':metrics[3].to(device)}
 
     test_df = pd.DataFrame(columns=["Loss", "Dice", "Precision", "Recall", "IoU"])
     

@@ -106,7 +106,8 @@ def main():
     datasets['test'] = ProcessedWoundDataset(cfg.DATA.PATH + 'processed/test/')
 
     dataloaders = {x: DataLoader(dataset=datasets[x], batch_size=cfg.TRAIN.BATCH_SIZE, shuffle=True,
-                                 num_workers=cfg.SYSTEM.NUM_WORKERS, drop_last=True) for x in ['train','val', 'test']}
+                                 num_workers=cfg.SYSTEM.NUM_WORKERS, drop_last=True) 
+                                 for x in ['train','val', 'test']}
     
     # Instantiate the model
     print("Loading the model")
@@ -129,7 +130,6 @@ def main():
 
         cfg.TRAIN.NUM_EPOCHS = 100
         cfg.TRAIN.LR = 0.001
-
 
     # Optimizer
     optimizer = torch.optim.Adam(model.parameters(), lr=cfg.TRAIN.LR)
