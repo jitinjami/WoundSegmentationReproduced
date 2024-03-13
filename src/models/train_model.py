@@ -124,7 +124,7 @@ def train(model, dataloaders, device, criterion, optimizer, num_epochs,
                 torch.save(model.state_dict(), model_save_path + f'{model_name}_model_last.pt')
 
         if model_name == 'WSNet':
-            if epoch % 10 == 0:
+            if epoch % 100 == 0:
                 model, val_metrics, val_df = val_epoch(model, dataloaders, device, 
                                                criterion, val_metrics, 
                                                val_df, epoch)

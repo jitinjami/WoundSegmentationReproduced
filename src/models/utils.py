@@ -32,6 +32,6 @@ class DiceLoss(nn.Module):
     union = input.sum() + target.sum()
 
     # Dice loss calculation
-    dice_loss = 1 - (2 * intersection + self.eps) / (union + self.eps)
+    dice = (2 * intersection + self.eps) / (union + self.eps)
 
-    return dice_loss
+    return 1 - dice
