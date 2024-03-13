@@ -123,8 +123,8 @@ def main():
         model = smp.Linknet(encoder_name="densenet169", encoder_weights="imagenet", in_channels=3, classes=1)
 
         # Loss function
-        # criterion = DiceLoss()
-        criterion = nn.BCELoss()
+        criterion = DiceLoss()
+        # criterion = nn.BCELoss()
 
     # Optimizer
     optimizer = torch.optim.Adam(model.parameters(), lr=cfg.TRAIN.LR)
