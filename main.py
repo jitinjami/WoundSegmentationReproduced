@@ -9,6 +9,7 @@ import torch
 import torch.nn as nn
 from torchmetrics import Dice, Precision, Recall, JaccardIndex
 import segmentation_models_pytorch as smp
+import segmentation_models_pytorch.losses.dice as DiceLoss
 import numpy as np
 import argparse
 from src.data.dataset import ProcessedWoundDataset
@@ -17,7 +18,6 @@ from src.utils import empty_directory
 from src.models.mobilnetv2 import MobileNetV2withDecoder
 from src.models.train_model import train
 from src.models.predict_model import test
-from src.models.utils import DiceLoss
 from config.defaults import get_cfg_defaults
 import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
