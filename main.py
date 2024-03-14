@@ -9,7 +9,6 @@ import torch
 import torch.nn as nn
 from torchmetrics import Dice, Precision, Recall, JaccardIndex
 import segmentation_models_pytorch as smp
-import segmentation_models_pytorch.losses.dice as DiceLoss
 import numpy as np
 import argparse
 from src.data.dataset import ProcessedWoundDataset
@@ -123,7 +122,7 @@ def main():
         model = smp.Linknet(encoder_name="densenet169", encoder_weights="imagenet", in_channels=3, classes=1)
 
         # Loss function
-        criterion = DiceLoss()
+        criterion = smp.losses.DiceLoss(mode='binary')
         # criterion = nn.BCELoss()
 
     # Optimizer
