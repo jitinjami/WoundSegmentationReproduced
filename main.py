@@ -28,8 +28,9 @@ def main():
 
     #Argument parser
     parser = argparse.ArgumentParser(description='WoundSegmentation with MobileNetV2 and LinkNet')
-    parser.add_argument('--mnv2', action='store_true')
-    parser.add_argument('--no-mnv2', dest='mnv2', action='store_false')
+    parser.add_argument('--mnv2', action="store_true", default=False, help="Run the MobV2 Model")
+    parser.add_argument('--wsnet', action="store_true", default=False, help="Run the WSNet Model")
+    parser.add_argument('--cgan', action="store_true", default=False, help="Run the cGAN Model")
     parser.add_argument("--train", action="store_true", default=False, help="Run the training module")
     parser.add_argument("--test", action="store_true", default=False, help="Run the testing module")
     parser.set_defaults(feature=True)
@@ -38,12 +39,19 @@ def main():
     args = parser.parse_args()
     cfg = get_cfg_defaults()
 
+    if (args.mnv2 and args.wsnet) or (args.mnv2 and args.cgan) or (args.cgan and args.wsnet):
+        print("Please choose only 1 model to train")
+        return None
+
     if args.mnv2:
         cfg.MNV2 = True
     
-    if not args.mnv2:
-        cfg.MNV2 = False
+    if args.wsnet:
+        cfg.WSN = True
     
+    if args.cgan:
+        cfg.CGAN = True
+
     device = None
 
     if torch.cuda.is_available():
@@ -71,11 +79,20 @@ def main():
         cfg.TRAIN.BATCH_SIZE = 2
         cfg.TRAIN.LR = 0.0001
     
-    if not cfg.MNV2:
+    if cfg.WSN:
         print("WSeg (LinkNet)")
         cfg.DATA.PATH = os.getcwd() + '/data_WSeg/'
         cfg.DATA.WS_AUG = True
         cfg.NAME = 'WSNet'
+        cfg.TRAIN.BATCH_SIZE = 16
+        cfg.TRAIN.LR = 0.001
+        cfg.TRAIN.NUM_EPOCHS = 100
+    
+    if cfg.CGAN:
+        print("cGAN")
+        cfg.DATA.PATH = os.getcwd() + '/data_WSeg/'
+        cfg.DATA.WS_AUG = True
+        cfg.NAME = 'cGAN'
         cfg.TRAIN.BATCH_SIZE = 16
         cfg.TRAIN.LR = 0.001
 
@@ -118,12 +135,11 @@ def main():
         # Loss function
         criterion = nn.BCELoss()
     
-    if not cfg.MNV2:
+    if cfg.WSN:
         model = smp.Linknet(encoder_name="densenet169", encoder_weights="imagenet", in_channels=3, classes=1)
 
         # Loss function
         criterion = smp.losses.DiceLoss(mode='binary')
-        # criterion = nn.BCELoss()
 
     # Optimizer
     optimizer = torch.optim.Adam(model.parameters(), lr=cfg.TRAIN.LR)

@@ -99,7 +99,7 @@ def train(model, dataloaders, device, criterion, optimizer, num_epochs,
     best_val_dice_coeff = -tol
     patience = 200
 
-    for epoch in range(num_epochs):
+    for epoch in range(num_epochs+1): #Running till 101 if epochs is set to 100
 
         print(f"Epoch: {epoch}/{num_epochs}")
 
@@ -124,7 +124,7 @@ def train(model, dataloaders, device, criterion, optimizer, num_epochs,
                 torch.save(model.state_dict(), model_save_path + f'{model_name}_model_last.pt')
 
         if model_name == 'WSNet':
-            if epoch % 100 == 0:
+            if epoch % 10 == 0:
                 model, val_metrics, val_df = val_epoch(model, dataloaders, device, 
                                                criterion, val_metrics, 
                                                val_df, epoch)

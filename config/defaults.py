@@ -6,6 +6,8 @@ from yacs.config import CfgNode as CN
 _C = CN()
 
 _C.MNV2 = True
+_C.WSN = False
+_C.CGAN = False
 
 _C.SYSTEM = CN()
 _C.SYSTEM.SEED = 42
