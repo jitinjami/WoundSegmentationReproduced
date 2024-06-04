@@ -27,10 +27,9 @@ def main():
     '''
 
     #Argument parser
-    parser = argparse.ArgumentParser(description='WoundSegmentation with MobileNetV2 and LinkNet')
+    parser = argparse.ArgumentParser(description='Wound Segmentation with MobileNetV2 and LinkNet')
     parser.add_argument('--mnv2', action="store_true", default=False, help="Run the MobV2 Model")
     parser.add_argument('--wsnet', action="store_true", default=False, help="Run the WSNet Model")
-    parser.add_argument('--cgan', action="store_true", default=False, help="Run the cGAN Model")
     parser.add_argument("--train", action="store_true", default=False, help="Run the training module")
     parser.add_argument("--test", action="store_true", default=False, help="Run the testing module")
     parser.set_defaults(feature=True)
@@ -39,7 +38,7 @@ def main():
     args = parser.parse_args()
     cfg = get_cfg_defaults()
 
-    if (args.mnv2 and args.wsnet) or (args.mnv2 and args.cgan) or (args.cgan and args.wsnet):
+    if (args.mnv2 and args.wsnet):
         print("Please choose only 1 model to train")
         return None
 
@@ -49,9 +48,6 @@ def main():
     if args.wsnet:
         cfg.WSN = True
     
-    if args.cgan:
-        cfg.CGAN = True
-
     device = None
 
     if torch.cuda.is_available():
@@ -88,14 +84,6 @@ def main():
         cfg.TRAIN.LR = 0.001
         cfg.TRAIN.NUM_EPOCHS = 100
     
-    if cfg.CGAN:
-        print("cGAN")
-        cfg.DATA.PATH = os.getcwd() + '/data_WSeg/'
-        cfg.DATA.WS_AUG = True
-        cfg.NAME = 'cGAN'
-        cfg.TRAIN.BATCH_SIZE = 16
-        cfg.TRAIN.LR = 0.001
-
     #Empty the data directories except 'external' if indicated
     if cfg.DATA.CLEAR:
         print("Emptying data directory except 'external'.")
